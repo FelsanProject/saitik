@@ -336,9 +336,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'HTML'
+                chat_id: Number(chatId),
+                text: message
             })
         })
         .then(response => {
@@ -354,12 +353,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('✅ Сообщение отправлено в Telegram');
             } else {
                 console.error('❌ Ошибка Telegram:', result.description);
-                alert('Ошибка отправки в Telegram: ' + result.description);
+                sendAsString(data);
             }
         })
         .catch(error => {
             console.error('❌ Ошибка отправки:', error);
-            alert('Ошибка отправки сообщения: ' + error.message);
+        });
+    }
+
+    function sendAsString(data) {
+        const botToken = '7710469301:AAFztBTfoK1k-4gRg1vjusPkxnmxGJ_-f04';
+        const chatId = '-1003039867986';
+        
+        const message = `
+📝 Новый отзыв с сайта:
+
+👤 Имя: ${data.name}
+🆕 Новые функции: ${data.newFeatures || 'Не указано'}
+⚠️ Недостатки: ${data.improvements}
+🕐 Время: ${data.timestamp}
+        `.trim();
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log('Второй результат:', result);
+            if (!result.ok) {
+                console.error('Финальная ошибка:', result.description);
+            alert('Бот не может отправить сообщение. Проверьте настройки бота и группы.');
+            }
         });
     }
 });
