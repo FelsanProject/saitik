@@ -135,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let allCardsSwiped = false;
 
     function showCard(index) {
-        // Сбрасываем все карточки
         swipeCards.forEach(card => {
             card.classList.remove('active');
             card.style.transform = 'translateX(0) rotate(0)';
@@ -146,14 +145,12 @@ document.addEventListener('DOMContentLoaded', function() {
             info.classList.remove('active');
         });
         
-        // Проверяем, не закончились ли карточки
         if (index >= swipeCards.length) {
             allCardsSwiped = true;
             showFinalCard();
             return;
         }
         
-        // Показываем текущую карточку
         if (swipeCards[index]) {
             swipeCards[index].classList.add('active');
             const cardId = swipeCards[index].getAttribute('data-id');
@@ -165,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showFinalCard() {
-        // Создаем финальную карточку если ее еще нет
         let finalCard = document.querySelector('.final-card');
         if (!finalCard) {
             finalCard = document.createElement('div');
@@ -188,7 +184,6 @@ document.addEventListener('DOMContentLoaded', function() {
             finalCard.classList.add('active');
         }
         
-        // Показываем финальное сообщение в профиле
         const profileInfo = document.querySelector('.profile-info');
         profileInfo.innerHTML = `
             <div class="info-content active">
@@ -205,9 +200,9 @@ document.addEventListener('DOMContentLoaded', function() {
     showCard(currentCardIndex);
 
     function handleDragStart(clientX) {
-        if (allCardsSwiped) return; // Блокируем свайпы на финальной карточке
+        if (allCardsSwiped) return;
         
-        const activeCard = document.querySelector('.swipe-card.active');
+        const activeCard = document.querySelector('.swipe-card.active:not(.final-card)');
         if (!activeCard) return;
         
         startX = clientX;
@@ -219,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleDragMove(clientX) {
         if (!isDragging || allCardsSwiped) return;
         
-        const activeCard = document.querySelector('.swipe-card.active');
+        const activeCard = document.querySelector('.swipe-card.active:not(.final-card)');
         if (!activeCard) return;
         
         currentX = clientX - startX;
@@ -244,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleDragEnd() {
         if (!isDragging || allCardsSwiped) return;
         
-        const activeCard = document.querySelector('.swipe-card.active');
+        const activeCard = document.querySelector('.swipe-card.active:not(.final-card)');
         if (!activeCard) return;
         
         isDragging = false;
