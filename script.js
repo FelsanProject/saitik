@@ -132,8 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let isDragging = false;
     let currentCardIndex = 0;
     let dragStartTime = 0;
+    let allCardsSwiped = false;
 
     function showCard(index) {
+        // Сбрасываем все карточки
         swipeCards.forEach(card => {
             card.classList.remove('active');
             card.style.transform = 'translateX(0) rotate(0)';
@@ -144,6 +146,14 @@ document.addEventListener('DOMContentLoaded', function() {
             info.classList.remove('active');
         });
         
+        // Проверяем, не закончились ли карточки
+        if (index >= swipeCards.length) {
+            allCardsSwiped = true;
+            showFinalCard();
+            return;
+        }
+        
+        // Показываем текущую карточку
         if (swipeCards[index]) {
             swipeCards[index].classList.add('active');
             const cardId = swipeCards[index].getAttribute('data-id');
@@ -154,9 +164,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function showFinalCard() {
+        // Создаем финальную карточку если ее еще нет
+        let finalCard = document.querySelector('.final-card');
+        if (!finalCard) {
+            finalCard = document.createElement('div');
+            finalCard.className = 'swipe-card final-card active';
+            finalCard.innerHTML = `
+                <div class="card-image">
+                    <div style="width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                             display:flex; align-items:center; justify-content:center; color:white; font-size:24px; 
+                             text-align:center; padding:20px; border-radius:20px;">
+                        <div>
+                            <div style="font-size:48px; margin-bottom:20px;">🎉</div>
+                            <strong>На этом все!</strong><br>
+                            Ожидайте обновлений!
+                        </div>
+                    </div>
+                </div>
+            `;
+            swipeContainer.appendChild(finalCard);
+        } else {
+            finalCard.classList.add('active');
+        }
+        
+        // Показываем финальное сообщение в профиле
+        const profileInfo = document.querySelector('.profile-info');
+        profileInfo.innerHTML = `
+            <div class="info-content active">
+                <div class="bio-field">
+                    <div style="text-align:center;">
+                        <h3 style="color:#ff6b6b; margin-bottom:15px;">Спасибо за просмотр!</h3>
+                        <p>Вы просмотрели все анкеты. Скоро появятся новые интересные персонажи!</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     showCard(currentCardIndex);
 
     function handleDragStart(clientX) {
+        if (allCardsSwiped) return; // Блокируем свайпы на финальной карточке
+        
         const activeCard = document.querySelector('.swipe-card.active');
         if (!activeCard) return;
         
@@ -167,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleDragMove(clientX) {
-        if (!isDragging) return;
+        if (!isDragging || allCardsSwiped) return;
         
         const activeCard = document.querySelector('.swipe-card.active');
         if (!activeCard) return;
@@ -192,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleDragEnd() {
-        if (!isDragging) return;
+        if (!isDragging || allCardsSwiped) return;
         
         const activeCard = document.querySelector('.swipe-card.active');
         if (!activeCard) return;
@@ -211,18 +261,12 @@ document.addEventListener('DOMContentLoaded', function() {
             activeCard.classList.add('swipe-right');
             setTimeout(() => {
                 currentCardIndex++;
-                if (currentCardIndex >= swipeCards.length) {
-                    currentCardIndex = 0;
-                }
                 showCard(currentCardIndex);
             }, 2000);
         } else if (currentX < -effectiveThreshold) {
             activeCard.classList.add('swipe-left');
             setTimeout(() => {
                 currentCardIndex++;
-                if (currentCardIndex >= swipeCards.length) {
-                    currentCardIndex = 0;
-                }
                 showCard(currentCardIndex);
             }, 2000);
         } else {
@@ -389,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Второй результат:', result);
             if (!result.ok) {
                 console.error('Финальная ошибка:', result.description);
-            alert('Бот не может отправить сообщение. Проверьте настройки бота и группы.');
+                alert('Бот не может отправить сообщение. Проверьте настройки бота и группы.');
             }
         });
     }
