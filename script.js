@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function sendToTelegram(data) {
         const botToken = '7710469301:AAFztBTfoK1k-4gRg1vjusPkxnmxGJ_-f04';
-        const chatId = 'absolute_relm';
+        const chatId = '6059769629';
         
         const message = `
 📝 Новый отзыв с сайта:
@@ -349,4 +349,5 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Ошибка отправки в Telegram:', error);
         });
     }
+
 });
