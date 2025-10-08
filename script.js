@@ -3,17 +3,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let audioStarted = false;
 
     function startAudio() {
-    if (audioStarted) return;
-    
-    audio.muted = false;
-    audio.volume = 0.5;
-    audio.play().then(() => {
-        audioStarted = true;
-        console.log('Музыка запущена');
-    }).catch(error => {
-        console.log('Автовоспроизведение заблокировано:', error);
-    });
-}
+        if (audioStarted) return;
+        
+        audio.muted = false;
+        audio.volume = 0.5;
+        audio.play().then(() => {
+            audioStarted = true;
+            console.log('Музыка запущена');
+        }).catch(error => {
+            console.log('Автовоспроизведение заблокировано:', error);
+        });
+    }
 
     document.body.click();
     startAudio();
@@ -341,15 +341,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 parse_mode: 'HTML'
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Сообщение отправлено в Telegram');
+        .then(response => {
+            console.log('Статус ответа:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('Полный ответ от Telegram:', result);
+            if (result.ok) {
+                console.log('✅ Сообщение отправлено в Telegram');
+            } else {
+                console.error('❌ Ошибка Telegram:', result.description);
+                alert('Ошибка отправки в Telegram: ' + result.description);
+            }
         })
         .catch(error => {
-            console.error('Ошибка отправки в Telegram:', error);
+            console.error('❌ Ошибка отправки:', error);
+            alert('Ошибка отправки сообщения: ' + error.message);
         });
     }
-
 });
-
-
